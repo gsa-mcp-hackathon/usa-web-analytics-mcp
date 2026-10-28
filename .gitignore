@@ -2,6 +2,7 @@
 .venv/
 venv/
 
+demo.ddb
 # Environment variables (keep .env.example, never commit .env)
 .env
 deploy/**/.env
