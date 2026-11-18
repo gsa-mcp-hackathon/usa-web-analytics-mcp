@@ -131,9 +131,9 @@ Prompts (`prompts/`) and resources (`resources/`) follow the exact same `registe
 
 Before publishing your server, rename `analytics_server` to your service (e.g. `census_mcp`):
 
-1. Rename the folder `src/analytics_server/` → `src/<your_name>/`.
-2. Update `pyproject.toml`: the `[project].name`, `[project.scripts]`, and `[tool.hatch.build.targets.wheel].packages`.
-3. Find-and-replace `analytics_server` across `src/`, `tests/`, `main.py`, `Dockerfile`, and `manifest.yaml`.
+1. Copy the folder  `src/example_server/` to `src/analytics_server/` --done
+2. Update `pyproject.toml`: the `[project].name`, `[project.scripts]`, and `[tool.hatch.build.targets.wheel].packages`. ---done
+3. Find-and-replace `example_server` across `src/`, `tests/`, `main.py`, `Dockerfile`, and `manifest.yaml`. ---done
 
 ---
 
