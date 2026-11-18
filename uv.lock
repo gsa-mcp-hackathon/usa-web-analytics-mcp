@@ -377,7 +377,7 @@ wheels = [
 ]
 
 [[package]]
-name = "example-server"
+name = "analytics-server"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

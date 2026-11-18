@@ -9,8 +9,8 @@ from __future__ import annotations
 import pytest
 from fastmcp import FastMCP
 
-from example_server.app import mcp
-from example_server.config import settings
+from analytics_server.app import mcp
+from analytics_server.config import settings
 
 
 def test_server_is_importable():
@@ -27,25 +27,25 @@ def test_default_transport_is_stdio():
 
 
 def test_tools_register_without_error():
-    from example_server.tools import register_tools
+    from analytics_server.tools import register_tools
 
     register_tools(FastMCP("test"))  # must not raise
 
 
 def test_prompts_register_without_error():
-    from example_server.prompts import register_prompts
+    from analytics_server.prompts import register_prompts
 
     register_prompts(FastMCP("test"))  # must not raise
 
 
 def test_resources_register_without_error():
-    from example_server.resources import register_resources
+    from analytics_server.resources import register_resources
 
     register_resources(FastMCP("test"))  # must not raise
 
 
 def test_routes_register_without_error():
-    from example_server.routes import register_routes
+    from analytics_server.routes import register_routes
 
     register_routes(FastMCP("test"))  # must not raise
 
