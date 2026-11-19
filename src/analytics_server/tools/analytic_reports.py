@@ -13,6 +13,7 @@ from urllib.parse import quote
 from fastmcp.exceptions import ToolError
 
 from analytics_server.models import PaginationParams, ResponseFormat
+from analytics_server.resources import parameters_values
 from analytics_server.utils import API_BASE_URL, API_KEY, UpstreamServiceError, fetch_json, paginate
 
 
@@ -50,7 +51,7 @@ def _query_params(
 
 
 def register(mcp: FastMCP) -> None:
-    """Register the example tool with the MCP server."""
+    """Register the get_analytic_reports tool with the MCP server."""
     @mcp.tool(
             name = "get_analytic_reports",
         annotations={
@@ -71,13 +72,20 @@ def register(mcp: FastMCP) -> None:
         """Get analytic reports across all government agencies.
 
         Args:
-            report_name: Name of the report to retrieve.
+            report_name: Name of the analytics report to retrieve.
             limit: Number of data points per page, from 1 to 10000. Defaults to 1000.
             page: Result page, starting at 1.
             after: Include dates on or after this YYYY-MM-DD date.
             before: Include dates on or before this YYYY-MM-DD date.
         """
-        report = _path_segment(report_name, "report_name")
+        report_path = _path_segment(report_name, "report_name")
+        report = parameters_values.validate_report(report_path)
+        if not report:
+            raise ToolError(
+                f"Invalid report '{report_path}'. "
+                "Please provide a valid report name."
+            )
+        
         params = _query_params(limit, page, after, before)
         try:
             payload = await fetch_json(

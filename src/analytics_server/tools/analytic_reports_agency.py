@@ -13,6 +13,7 @@ from urllib.parse import quote
 from fastmcp.exceptions import ToolError
 
 from analytics_server.models import PaginationParams, ResponseFormat
+from analytics_server.resources import parameters_values
 from analytics_server.utils import API_BASE_URL, API_KEY, UpstreamServiceError, fetch_json, paginate
 
 
@@ -48,79 +49,9 @@ def _query_params(
         raise ToolError("after must be on or before before.")
     return params
 
-# # Helper function to make GET requests to the Analytics API and return report data.
-# def _get_reports(
-#         path: str, 
-#         params: dict[str, int | str]
-#     ) -> list[dict[str, Any]]:
-
-#     try:
-#         response = requests.get(
-#             f"{API_BASE_URL}{path}",
-#             params=params,
-#             headers={"x-api-key": API_KEY, "Accept": "application/json"},
-#             timeout=10,
-#         )
-#         response.raise_for_status()
-#     except requests.HTTPError as exc:
-#         status = exc.response.status_code if exc.response is not None else "unknown"
-#         raise ToolError(f"Analytics API returned HTTP {status}.") from exc
-#     except requests.RequestException as exc:
-#         raise ToolError("Could not reach the Analytics API; check the URL and connection.") from exc
-#     try:
-#         data = response.json()
-#     except ValueError as exc:
-#         raise ToolError("Analytics API returned invalid JSON.") from exc
-#     if not isinstance(data, list) or any(not isinstance(item, dict) for item in data):
-#         raise ToolError("Analytics API must return a JSON array of report objects.")
-#     return data
-
 
 def register(mcp: FastMCP) -> None:
-    """Register the example tool with the MCP server."""
-    @mcp.tool(
-            name = "get_analytic_reports",
-            annotations={
-                "title": "Search Datasets (example)",
-                "readOnlyHint": True,
-                "destructiveHint": False,
-                "idempotentHint": True,
-                "openWorldHint": True,
-            },
-    )
-    async def get_analytic_reports(
-        report_name: str,
-        limit: int = 1000,
-        page: int = 1,
-        after: str | None = None,
-        before: str | None = None,
-    ) -> list[dict[str, Any]]:
-        """Get analytic reports across all government agencies.
-
-        Args:
-            report_name: Name of the report to retrieve.
-            limit: Number of data points per page, from 1 to 10000. Defaults to 1000.
-            page: Result page, starting at 1.
-            after: Include dates on or after this YYYY-MM-DD date.
-            before: Include dates on or before this YYYY-MM-DD date.
-        """
-        report = _path_segment(report_name, "report_name")
-        params = _query_params(limit, page, after, before)
-        try:
-             payload = await fetch_json(
-                            f"{API_BASE_URL}/reports/{report}/data",
-                            params=params,
-                            headers={"x-api-key": API_KEY},
-            )
-        # except httpx.HTTPStatusError as exc:
-        except UpstreamServiceError as exc:
-            return {
-                "error": str(exc),
-                "hint": "Check your API key and that the query isn't empty.",
-            }
-        results = payload.get("results", [])
-        return results
-
+    """Register the get_agency_analytic_reports tool with the MCP server."""
 
     @mcp.tool(
             name="get_agency_analytic_reports",
@@ -143,31 +74,45 @@ def register(mcp: FastMCP) -> None:
         """Get analytic reports filtered by a government agency.
 
         Args:
-            agency_name: Name of the agency to filter by.
-            report_name: Name of the report to retrieve.
+            agency_name: Name of the agency to filter by. Required.
+            report_name: Name of the report to retrieve. Required.
             limit: Number of data points per page, from 1 to 10000. Defaults to 1000.
             page: Result page, starting at 1.
             after: Include dates on or after this YYYY-MM-DD date.
             before: Include dates on or before this YYYY-MM-DD date.
         """
-        agency = _path_segment(agency_name, "agency_name")
-        report = _path_segment(report_name, "report_name")
+        agency_path = _path_segment(agency_name, "agency_name")
+        agency = parameters_values.validate_agency(agency_path)
+        if not agency:
+            raise ToolError(
+                f"Invalid agency '{agency_path}'. "
+                "Please provide a valid agency name or acronym."
+            )
+
+        report_path = _path_segment(report_name, "report_name")
+        report = parameters_values.validate_report(report_path)
+        if not report:
+            raise ToolError(
+                f"Invalid report '{report_path}'. "
+                "Please provide a valid report name."
+            )
+    
         params = _query_params(limit, page, after, before)
-        # return _get_reports(f"/agencies/{agency}/reports/{report}/data", params)
         try:
             payload = await fetch_json(
-                f"{API_BASE_URL}/agencies/{agency}/reports/{report}/data",
+                f"agencies/{agency}/reports/{report}/data",
                 params=params,
                 headers={"x-api-key": API_KEY},
             )
         # except httpx.HTTPStatusError as exc:
         except UpstreamServiceError as exc:
-            return {
-                "error": str(exc),
-                "hint": "Check your API key and that the query isn't empty.",
-            }
-        results = payload.get("results", [])
-        return results
+            raise ToolError(str(exc)) from exc
+        
+        # API returns either a list directly or a dict with "results" key
+        if isinstance(payload, list):
+            return payload
+        return payload.get("results", [])
+
 
         # page = paginate(results, pagination.limit, pagination.offset)
 
