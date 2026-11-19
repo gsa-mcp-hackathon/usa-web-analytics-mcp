@@ -35,7 +35,7 @@ def get_dap_analytics(report: str, agency: str = None, domain: str = None) -> st
         if report not in ['top-pages-realtime', 'second-level-domain']:
             params['agency'] = agency
 
-    headers = {"X-API-KEY": api_key}
+    headers = {"x-api-key": api_key}
 
     try:
         response = requests.get(endpoint, headers=headers, params=params)

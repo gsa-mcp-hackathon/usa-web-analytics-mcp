@@ -42,6 +42,6 @@ def register(mcp: FastMCP) -> None:
             "or filtered by agency. Data comes from the GSA Digital Analytics Program. "
             "The program does not track individuals and anonymizes visitor IP addresses. "
             "Tools return JSON arrays and support pagination and inclusive YYYY-MM-DD "
-            "date filters. Set ANALYTICS_API_KEY for X-API-KEY authentication and optionally "
+            "date filters. Set ANALYTICS_API_KEY for x-api-key authentication and optionally "
             "ANALYTICS_API_BASE_URL to override the GSA API URL."
         )

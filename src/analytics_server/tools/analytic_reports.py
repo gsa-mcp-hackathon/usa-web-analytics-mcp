@@ -83,7 +83,7 @@ def register(mcp: FastMCP) -> None:
             payload = await fetch_json(
                 f"reports/{report}/data",
                 params=params,
-                headers={"X-API-Key": API_KEY},
+                headers={"x-api-key": API_KEY},
             )
         # except httpx.HTTPStatusError as exc:
         except UpstreamServiceError as exc:

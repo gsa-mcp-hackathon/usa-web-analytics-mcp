@@ -58,7 +58,7 @@ def _query_params(
 #         response = requests.get(
 #             f"{API_BASE_URL}{path}",
 #             params=params,
-#             headers={"X-API-KEY": API_KEY, "Accept": "application/json"},
+#             headers={"x-api-key": API_KEY, "Accept": "application/json"},
 #             timeout=10,
 #         )
 #         response.raise_for_status()
@@ -110,7 +110,7 @@ def register(mcp: FastMCP) -> None:
              payload = await fetch_json(
                             f"{API_BASE_URL}/reports/{report}/data",
                             params=params,
-                            headers={"X-API-Key": API_KEY},
+                            headers={"x-api-key": API_KEY},
             )
         # except httpx.HTTPStatusError as exc:
         except UpstreamServiceError as exc:
@@ -158,7 +158,7 @@ def register(mcp: FastMCP) -> None:
             payload = await fetch_json(
                 f"{API_BASE_URL}/agencies/{agency}/reports/{report}/data",
                 params=params,
-                headers={"X-API-Key": API_KEY},
+                headers={"x-api-key": API_KEY},
             )
         # except httpx.HTTPStatusError as exc:
         except UpstreamServiceError as exc:

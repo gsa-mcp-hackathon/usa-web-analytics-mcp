@@ -51,7 +51,7 @@ def register(mcp: FastMCP) -> None:
             )
 
         # Not needed for fetching the CSV directly from the public URL.
-        # headers = {"X-API-KEY": API_KEY}
+        # headers = {"x-api-key": API_KEY}
         # params = {}  # Add any query parameters if needed
 
         csv_url = f"https://analytics.usa.gov/data/{agency}/top-pages-realtime.csv"

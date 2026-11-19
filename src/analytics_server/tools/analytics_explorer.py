@@ -66,7 +66,7 @@ def register(mcp: FastMCP) -> None:
             if report not in ['top-pages-realtime', 'second-level-domain']:
                 params['agency'] = agency
 
-        headers = {"X-API-KEY": API_KEY}
+        headers = {"x-api-key": API_KEY}
 
         try:
             async with httpx.AsyncClient() as client:
