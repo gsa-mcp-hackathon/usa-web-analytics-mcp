@@ -1,13 +1,24 @@
 load httpfs;
 install httpfs;
-CREATE TABLE demo AS 
+CREATE schema stg;
+CREATE TABLE stg.top_downloads AS 
 FROM
-        read_json('https://api.gsa.gov/analytics/dap/v2.0.0/reports/site/data?api_key=DEMO_KEY1');
-DESC demo;
-summarize demo;
-
+  read_csv('https://analytics.usa.gov/data/live/top-downloads-7-days.csv');
+CREATE TABLE stg.top_video_plays AS 
 FROM
-        demo
-ORDER BY
-        visits DESC
-LIMIT 10;
+  read_csv('https://analytics.usa.gov/data/live/top-video-plays-7-days.csv');
+CREATE TABLE stg.top_pages_and_screens AS 
+FROM
+  read_csv('https://analytics.usa.gov/data/live/top-downloads-7-days.csv');
+CREATE TABLE stg.top_domains AS 
+FROM
+  read_csv('https://analytics.usa.gov/data/live/top-100000-domains-30-days.csv');
+CREATE TABLE stg.users_per_city AS 
+FROM
+  read_csv('https://analytics.usa.gov/data/live/top-cities-realtime.csv');
+CREATE TABLE stg.devices_90_days AS 
+FROM
+  read_csv('https://analytics.usa.gov/data/live/devices-90-days.csv');
+CREATE TABLE stg.os_browsers AS 
+FROM
+  read_csv('https://analytics.usa.gov/data/live/os-browsers.csv');
