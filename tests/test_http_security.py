@@ -7,7 +7,7 @@ from typing import Any
 import httpx
 import pytest
 
-from example_server import utils
+from analytics_server import utils
 
 
 @pytest.mark.parametrize(

@@ -29,7 +29,7 @@ mcp-hackathon-template/
 ├── .env.example               # Copy to .env for local dev
 ├── .github/workflows/ci.yml   # Lint + test on push/PR
 ├── src/
-│   └── example_server/        # ← rename to your service
+│   └── analytics_server/        # ← rename to your service
 │       ├── app.py             # Thin entry point: builds FastMCP, picks transport
 │       ├── config.py          # Settings from env vars / .env
 │       ├── models.py          # Pydantic models & enums for tool params
@@ -81,16 +81,16 @@ uv run ruff check .          # lint
 
 ## The one-tool-per-file pattern
 
-Each tool lives in its own file under `src/example_server/tools/` and exposes a `register(mcp)` function. `tools/__init__.py` calls each one from a single `register_tools(mcp)`. This keeps the tool list scannable and lets you add or remove an integration by touching two files.
+Each tool lives in its own file under `src/analytics_server/tools/` and exposes a `register(mcp)` function. `tools/__init__.py` calls each one from a single `register_tools(mcp)`. This keeps the tool list scannable and lets you add or remove an integration by touching two files.
 
-**Step 1 — create `src/example_server/tools/my_tool.py`:**
+**Step 1 — create `src/analytics_server/tools/my_tool.py`:**
 
 ```python
 from typing import Annotated
 from urllib.parse import quote
 from fastmcp import FastMCP
 
-from example_server.utils import fetch_json
+from analytics_server.utils import fetch_json
 
 
 def register(mcp: FastMCP) -> None:
@@ -114,7 +114,7 @@ def register(mcp: FastMCP) -> None:
 **Step 2 — wire it up in `tools/__init__.py`:**
 
 ```python
-from example_server.tools import example_tool, my_tool
+from analytics_server.tools import example_tool, my_tool
 
 def register_tools(mcp) -> None:
     example_tool.register(mcp)
@@ -129,11 +129,11 @@ Prompts (`prompts/`) and resources (`resources/`) follow the exact same `registe
 
 ## Rename the package
 
-Before publishing your server, rename `example_server` to your service (e.g. `census_mcp`):
+Before publishing your server, rename `analytics_server` to your service (e.g. `census_mcp`):
 
-1. Rename the folder `src/example_server/` → `src/<your_name>/`.
-2. Update `pyproject.toml`: the `[project].name`, `[project.scripts]`, and `[tool.hatch.build.targets.wheel].packages`.
-3. Find-and-replace `example_server` across `src/`, `tests/`, `main.py`, `Dockerfile`, and `manifest.yaml`.
+1. Copy the folder  `src/example_server/` to `src/analytics_server/` --done
+2. Update `pyproject.toml`: the `[project].name`, `[project.scripts]`, and `[tool.hatch.build.targets.wheel].packages`. ---done
+3. Find-and-replace `example_server` across `src/`, `tests/`, `main.py`, `Dockerfile`, and `manifest.yaml`. ---done
 
 ---
 

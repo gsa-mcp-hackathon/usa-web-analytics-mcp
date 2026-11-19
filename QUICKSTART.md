@@ -39,7 +39,7 @@ to this repo:
   "mcpServers": {
     "example-mcp": {
       "command": "uv",
-      "args": ["run", "example-server"],
+      "args": ["run", "analytics-server"],
       "cwd": "/absolute/path/to/mcp-hackathon-template"
     }
   }
