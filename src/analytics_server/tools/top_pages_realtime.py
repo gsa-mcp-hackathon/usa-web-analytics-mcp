@@ -15,15 +15,12 @@ Tool design tips for federal datasets:
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from importlib import import_module
-from typing import Annotated, Any
+from typing import Any
 
 import httpx
 from fastmcp import FastMCP
+from fastmcp.exceptions import ToolError
 
-from analytics_server.models import PaginationParams, ResponseFormat
-from analytics_server.utils import API_BASE_URL, API_KEY, fetch_json, paginate
 from analytics_server.resources import parameters_values
 
 
@@ -39,21 +36,19 @@ def register(mcp: FastMCP) -> None:
             "openWorldHint": True,
         },
     )
-    async def get_top_pages_realtime(agency: str) -> str:
-        """Fetches the last 30 minutes of top pages for the specified agency from the real-time analytics data.
-        
-        Parameters:
-        - agency: The name of the agency in lower case with hyphens (e.g. 'national-library-medicine') 
-        or its uppercase acronym (e.g. 'NLM','HHS', 'USDA', 'GSA')
+    async def get_top_pages_realtime(agency: str) -> list[dict[str, Any]]:
+        """Fetch the last 30 minutes of top pages for the specified agency.
+
+        Args:
+            agency: Agency name in lower case with hyphens, or its acronym.
         """
-        try:
-            # Validate the agency by calling the validate_agency function from parameters_values
-            parameters = import_module("analytics_server.resources.parameters_values")
-            agency = parameters.validate_agency(agency)
-            if not agency:
-                return f"Invalid agency '{agency}'. Please provide a valid agency name or acronym."
-        except ImportError:
-            return "Agency options could not be loaded from analytics_server.resources.parameters_values."
+        original_agency = agency
+        agency = parameters_values.validate_agency(agency)
+        if not agency:
+            raise ToolError(
+                f"Invalid agency '{original_agency}'. "
+                "Please provide a valid agency name or acronym."
+            )
 
         # Not needed for fetching the CSV directly from the public URL.
         # headers = {"X-API-KEY": API_KEY}
@@ -66,29 +61,23 @@ def register(mcp: FastMCP) -> None:
             async with httpx.AsyncClient() as client:
                 response = await client.get(csv_url)
                 if response.status_code != 200:
-                    return f"API Error {response.status_code}: {response.text}"
-                # The response is expected to be CSV, so we need to parse it accordingly
-                # For now, let's just read it as text and split by lines
-                text_data = response.text
-                lines = text_data.splitlines()
-                if not lines:
-                    return "No records found in the CSV response."
+                    raise ToolError(
+                        f"Analytics API returned HTTP {response.status_code}."
+                    )
 
-                # Convert the CSV lines into a list of dictionaries
+                text_data = response.text
+                if not text_data.strip():
+                    return []
+
                 import csv
                 from io import StringIO
 
                 csv_reader = csv.DictReader(StringIO(text_data))
                 data = list(csv_reader)
 
-                if not data:
-                    return "No records found for the given criteria."
-
                 return data
 
-        except Exception as e:
-            return f"An unexpected exception occurred: {str(e)}"
-
-    # Keep httpx + fetch_json imported so the commented example above is
-    # copy-paste ready (remove these once you wire in the real API call).
-    _ = (httpx, fetch_json)
+        except httpx.HTTPError as exc:
+            raise ToolError(
+                "Could not retrieve real-time analytics data."
+            ) from exc
