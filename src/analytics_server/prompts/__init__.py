@@ -11,12 +11,12 @@ To add a prompt:
 
 from __future__ import annotations
 
-from analytics_server.prompts import example
+from analytics_server.prompts import analyze_report
 
 
 def register_prompts(mcp) -> None:
     """Register all prompts with the MCP server."""
-    example.register(mcp)
+    analyze_report.register(mcp)
 
 
 __all__ = ["register_prompts"]

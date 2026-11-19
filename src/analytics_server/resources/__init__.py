@@ -9,14 +9,14 @@ them into `register_resources(mcp)`.
 
 from __future__ import annotations
 
-from analytics_server.resources import about, data, parameters
+from analytics_server.resources import about, data, parameters_values
 
 
 def register_resources(mcp) -> None:
     """Register all resources with the MCP server."""
     about.register(mcp)
     data.register(mcp)
-    parameters.register(mcp)
+    parameters_values.register(mcp)
 
 
 __all__ = ["register_resources"]

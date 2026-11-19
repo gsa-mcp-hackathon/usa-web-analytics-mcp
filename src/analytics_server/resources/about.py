@@ -33,3 +33,15 @@ def register(mcp: FastMCP) -> None:
             "deploy": "See deploy/ for IBM and Databricks deployment kits.",
         }
         return pages.get(topic, f"No documentation found for topic '{topic}'.")
+
+    @mcp.resource("analytics://about")
+    def about() -> str:
+        """Explain the Analytics API tools and their data source."""
+        return (
+            "Analytics Server retrieves government web analytics reports across agencies "
+            "or filtered by agency. Data comes from the GSA Digital Analytics Program. "
+            "The program does not track individuals and anonymizes visitor IP addresses. "
+            "Tools return JSON arrays and support pagination and inclusive YYYY-MM-DD "
+            "date filters. Set ANALYTICS_API_KEY for X-API-KEY authentication and optionally "
+            "ANALYTICS_API_BASE_URL to override the GSA API URL."
+        )

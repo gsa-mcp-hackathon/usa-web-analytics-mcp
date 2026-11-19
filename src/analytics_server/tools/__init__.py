@@ -11,12 +11,13 @@ To add a tool:
 
 from __future__ import annotations
 
-from analytics_server.tools import example_tool
+from analytics_server.tools import analytic_reports, top_pages_realtime
 
 
 def register_tools(mcp) -> None:
     """Register all tools with the MCP server."""
-    example_tool.register(mcp)
+    analytic_reports.register(mcp)
+    top_pages_realtime.register(mcp)
 
 
 __all__ = ["register_tools"]

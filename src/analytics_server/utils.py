@@ -13,7 +13,6 @@ from urllib.parse import unquote, urlsplit
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
 
-
 import httpx
 
 # Federal APIs can be slow or intermittently unresponsive — always use an
@@ -23,17 +22,25 @@ MAX_RESPONSE_BYTES = 5_000_000
 
 # Keep outbound origins operator-controlled. Do not replace this with a tool
 # argument; add another narrowly scoped client when integrating another API.
-# API_BASE_URL = "https://api.example.gov/v1/"
 # Hardcoding these for now, replace with environment variables in production.
 DEFAULT_API_BASE_URL = "https://api.gsa.gov/analytics/dap/v2"
 DEFAULT_API_KEY = "DEMO_KEY"
 API_BASE_URL = os.environ.get("ANALYTICS_API_BASE_URL", DEFAULT_API_BASE_URL).rstrip("/")
 if not API_BASE_URL:
     raise ToolError("ANALYTICS_API_BASE_URL must not be empty.")
+API_KEY = os.environ.get("ANALYTICS_API_KEY", DEFAULT_API_KEY)
+if not API_KEY:
+    raise ToolError("ANALYTICS_API_KEY must not be empty.")
 
 class UpstreamServiceError(RuntimeError):
     """Sanitized external-service failure safe to return to an MCP client."""
 
+# Add a function to get the API key from the environment or use the default.
+# def get_api_key() -> str:
+#     api_key = os.environ.get("ANALYTICS_API_KEY", DEFAULT_API_KEY)
+#     if not api_key:
+#         raise ToolError("ANALYTICS_API_KEY environment variable is not set.")
+#     return api_key 
 
 def _validate_relative_path(path: str) -> str:
     """Reject paths that could select or escape the configured API origin."""
