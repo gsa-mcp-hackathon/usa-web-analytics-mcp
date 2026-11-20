@@ -12,17 +12,18 @@ from fastmcp import FastMCP
 
 
 def register(mcp: FastMCP) -> None:
-    """Register the example resource(s) with the MCP server."""
+    """Register the US website analytics resource(s) with the MCP server."""
 
     @mcp.resource("about://info/server")
     def server_info() -> str:
-        """Basic information about this MCP server.
+        """This is a United States government web analytics MCP server.
 
-        Replace with a better description of our project.
+        It provides access to web analytics data for government websites.
+        It was developed as part of the GSA MCP hackathon.
         """
         return (
             "NLMs GSA Hackathon MCP Server\n\n"
-            "This is a the National Library of Medicine's server for the GSA MCP hackathon.\n"
+            "This is a the National Library of Medicine's entry for the GSA 2026 MCP server hackathon.\n"
         )
 
     @mcp.resource("about://docs/{topic}")
@@ -38,10 +39,10 @@ def register(mcp: FastMCP) -> None:
     def about() -> str:
         """Explain the Analytics API tools and their data source."""
         return (
-            "Analytics Server retrieves government web analytics reports across agencies "
-            "or filtered by agency. Data comes from the GSA Digital Analytics Program. "
+            "Analytics Server retrieves US government web analytics reports across allagencies "
+            "or filtered by agency and or web domain. Data comes from the GSA Digital Analytics Program. "
             "The program does not track individuals and anonymizes visitor IP addresses. "
             "Tools return JSON arrays and support pagination and inclusive YYYY-MM-DD "
-            "date filters. Set ANALYTICS_API_KEY for x-api-key authentication and optionally "
-            "ANALYTICS_API_BASE_URL to override the GSA API URL."
+            "date filters. Set ANALYTICS_API_KEY for x-api-key authentication"
+            "and optionally set ANALYTICS_API_BASE_URL to override the GSA API URL."
         )

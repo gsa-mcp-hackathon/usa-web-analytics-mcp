@@ -36,13 +36,15 @@ to this repo:
 
 ```json
 {
+
   "mcpServers": {
-    "example-mcp": {
+    "analytics-mcp": {
       "command": "uv",
       "args": ["run", "analytics-server"],
       "cwd": "/absolute/path/to/mcp-hackathon-template"
     }
   }
+  
 }
 ```
 
@@ -50,8 +52,9 @@ to this repo:
 
 Add the same block to
 `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or
-`%APPDATA%\Claude\claude_desktop_config.json` (Windows), then restart Claude
-Desktop.
+`%APPDATA%\Claude\claude_desktop_config.json` (Windows), then restart Claude Desktop. 
+    Note: this assumes Claude desktop is installed in the AppData\Roaming\Claude but depending on the install the folder my be AppData\Local\Claude-3p. Use of MCP servers maybe restricted if installed by an organization. 
+
 
 Once connected, ask the client to call the example tool, e.g.:
 
@@ -74,8 +77,18 @@ Cloud hosts run the server over HTTP. Try it locally:
 
 ```bash
 MCP_TRANSPORT=streamable-http uv run python main.py
+
 # in another terminal:
 curl http://localhost:8000/health      # {"status":"healthy",...}
+```
+
+```windows
+
+$env:MCP_TRANSPORT = "streamable-http"
+uv run python main.py
+
+# in another terminal:
+curl http://localhost:8000/health
 ```
 
 ---
