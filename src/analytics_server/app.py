@@ -31,9 +31,7 @@ from analytics_server.tools import register_tools
 mcp = FastMCP(
     name="Analytics MCP Server",
     instructions=(
-        "Starter MCP server for the GSA MCP hackathon. "
-        "Replace this description, the tools, and the package name with your "
-        "own service. See the repo README to get started."
+        "This server provides United States government web site analytics capabilities via the MCP protocol. "
     ),
 )
 
