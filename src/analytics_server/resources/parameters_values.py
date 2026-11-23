@@ -10,6 +10,7 @@ Resource URI conventions:
 from __future__ import annotations
 
 import json
+from textwrap import indent
 from urllib.request import urlopen
 
 from fastmcp import FastMCP
@@ -199,22 +200,6 @@ def validate_agency(agency: str) -> str:
 
 
 
-def register(mcp: FastMCP) -> None:
-    """Register the agency paramater resource(s) with the MCP server."""
-
-    @mcp.resource("parameters://agencies")
-    def agencies() -> str:
-        """Return a list of U.S. federal agencies.
-        
-        This is a static list of U.S. federal agencies that can be used as parameter values
-        for MCP tools.
-
-        """        
-        return json.dumps(agencies_list, indent=2)
-
-
-
-
 report_names = {
     "download": "The count of download events for each downloaded file",
     "traffic-source": "The count of visitors for each traffic source",
@@ -241,17 +226,42 @@ def validate_report(report: str) -> str:
         return ""
 
 
-
 def register(mcp: FastMCP) -> None:
-    """Register the report parameter resource(s) with the MCP server."""
+    """Register the agency paramater resource(s) with the MCP server."""
 
+    @mcp.resource("parameters://agencies")
+    def agencies() -> str:
+        """Return a list of U.S. federal agencies.
+        
+        This is a static list of U.S. federal agencies that can be used as parameter values
+        for the analytic MCP tools.
+
+        """        
+        return json.dumps(agencies_list, indent=2)
+ 
+    @mcp.resource("parameters://agency_acronyms")
+    def agency_acronyms_resource() -> str:
+        """Return a mapping of agency acronyms to full agency names.
+        
+        This is a static mapping that can be used as parameter values
+        for the analytic MCP tools. The mapping keys are agency acronyms and the values are the corresponding full agency names.
+
+        """        
+        return json.dumps(agency_acronyms, indent=2)
+       
     @mcp.resource("parameters://reports")
     def reports() -> str:
         """Return a list of analytic report names.
         
-        This is a static list of analytic report names that can be used as parameter values
-        for MCP tools.
+        This is a static list of  report names that can be used as parameter values
+        for the analytic MCP tools.
 
         """        
         return json.dumps(list(report_names.keys()), indent=2)
 
+    @mcp.resource("parameters://reports_definitions")
+    def reports() -> str:
+        """Return a list of analytic report names and their definitions.
+
+        """        
+        return json.dumps(report_names, indent=2)

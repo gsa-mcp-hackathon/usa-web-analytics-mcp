@@ -43,3 +43,6 @@ htmlcov/
 
 API.txt
 Dockerfile.zip
+
+# Postman instructions
+.github/instructions/*.md

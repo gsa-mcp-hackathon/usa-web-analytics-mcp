@@ -29,7 +29,7 @@ def register(mcp: FastMCP) -> None:
 
     @mcp.tool("get_top_pages_realtime",
         annotations={
-            "title": "Search Datasets (example)",
+            "title": "Get the Top Pages (Realtime) for a US Government Agency",
             "readOnlyHint": True,
             "destructiveHint": False,
             "idempotentHint": True,
@@ -40,7 +40,7 @@ def register(mcp: FastMCP) -> None:
         """Fetch the last 30 minutes of top pages for the specified agency.
 
         Args:
-            agency: Agency name in lower case with hyphens, or its acronym.
+            agency: Agency name in lower case with hyphens, or its acronym (required).
         """
         original_agency = agency
         agency = parameters_values.validate_agency(agency)
