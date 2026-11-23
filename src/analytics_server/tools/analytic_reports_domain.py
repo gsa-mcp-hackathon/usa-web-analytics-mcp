@@ -66,7 +66,7 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool(
             name="get_domain_analytic_reports",
             annotations={
-                "title": "Search Datasets (example)",
+                "title": "Get Analytic Reports for a US Government Web Domain",
                 "readOnlyHint": True,
                 "destructiveHint": False,
                 "idempotentHint": True,
@@ -74,8 +74,8 @@ def register(mcp: FastMCP) -> None:
             },
     )
     async def get_domain_analytic_reports(
-        domain_name: str,
-        report_name: str,
+        domain: str,
+        report: str,
         limit: int = 1000,
         page: int = 1,
         after: str | None = None,
@@ -84,27 +84,27 @@ def register(mcp: FastMCP) -> None:
         """Get analytic reports filtered by a government web domain.
 
         Args:
-            domain_name: Name of the domain to filter by. Must be a valid US agency domain. Required.
-            report_name: Name of the report to retrieve. Required.
+            domain: Name of the domain to filter by. Must be a valid US agency domain (required).
+            report: Name of the report to retrieve (required).
             limit: Number of data points per page, from 1 to 10000. Defaults to 1000.
             page: Result page, starting at 1.
             after: Include dates on or after this YYYY-MM-DD date.
             before: Include dates on or before this YYYY-MM-DD date.
         """
         # Strip leading and trailing whitespace
-        domain_name = domain_name.strip()
+        domain = domain.strip()
         # hhtp:// or https:// should not be included in the domain name so strip them if present
-        domain_name = re.sub(r"^https?://", "", domain_name, flags=re.IGNORECASE)
+        domain = re.sub(r"^https?://", "", domain, flags=re.IGNORECASE)
         
-        if not _is_us_gov_web_domain(domain_name):
+        if not _is_us_gov_web_domain(domain):
             raise ToolError(
-                f"Invalid domain '{domain_name}'. "
+                f"Invalid domain '{domain}'. "
                 "Please provide a valid US agency domain name."
             )
-        domain = _path_segment(domain_name, "domain_name")
+        domain = _path_segment(domain, "domain")
 
 
-        report_path = _path_segment(report_name, "report_name")
+        report_path = _path_segment(report, "report")
         report = parameters_values.validate_report(report_path)
         if not report:
             raise ToolError(
@@ -127,18 +127,4 @@ def register(mcp: FastMCP) -> None:
         if isinstance(payload, list):
             return payload
         return payload.get("results", [])
-
-
-        # page = paginate(results, pagination.limit, pagination.offset)
-
-        # if response_format is ResponseFormat.MARKDOWN:
-        #     lines = [f"# Datasets matching '{query}'", ""]
-        #     lines += [f"- **{r['title']}** (`{r['id']}`)" for r in page["items"]]
-        #     lines.append("")
-        #     lines.append(
-        #         f"_Showing {page['count']} of {page['total']}._"
-        #         + (f" Next offset: {page['next_offset']}." if page["has_more"] else "")
-        #     )
-        #     return "\n".join(lines)
-
 

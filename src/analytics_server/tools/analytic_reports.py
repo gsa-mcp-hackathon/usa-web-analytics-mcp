@@ -55,7 +55,7 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool(
             name = "get_analytic_reports",
         annotations={
-                "title": "Search Datasets (example)",
+                "title": "Get Analytic Reports for all Agencies",
                 "readOnlyHint": True,
                 "destructiveHint": False,
                 "idempotentHint": True,
@@ -63,7 +63,7 @@ def register(mcp: FastMCP) -> None:
             },
     )
     async def get_analytic_reports(
-        report_name: str,
+        report: str,
         limit: int = 1000,
         page: int = 1,
         after: str | None = None,
@@ -72,13 +72,13 @@ def register(mcp: FastMCP) -> None:
         """Get analytic reports across all government agencies.
 
         Args:
-            report_name: Name of the analytics report to retrieve.
+            report: Name of the analytics report to retrieve (required).
             limit: Number of data points per page, from 1 to 10000. Defaults to 1000.
             page: Result page, starting at 1.
             after: Include dates on or after this YYYY-MM-DD date.
             before: Include dates on or before this YYYY-MM-DD date.
         """
-        report_path = _path_segment(report_name, "report_name")
+        report_path = _path_segment(report, "report")
         report = parameters_values.validate_report(report_path)
         if not report:
             raise ToolError(

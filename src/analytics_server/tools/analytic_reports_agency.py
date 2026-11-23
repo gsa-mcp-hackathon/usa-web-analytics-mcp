@@ -56,7 +56,7 @@ def register(mcp: FastMCP) -> None:
     @mcp.tool(
             name="get_agency_analytic_reports",
             annotations={
-                "title": "Search Datasets (example)",
+                "title": "Get Web Analytics Reports for a US Government Agency",
                 "readOnlyHint": True,
                 "destructiveHint": False,
                 "idempotentHint": True,
@@ -64,8 +64,8 @@ def register(mcp: FastMCP) -> None:
             },
     )
     async def get_agency_analytic_reports(
-        agency_name: str,
-        report_name: str,
+        agency: str,
+        report: str,
         limit: int = 1000,
         page: int = 1,
         after: str | None = None,
@@ -74,14 +74,14 @@ def register(mcp: FastMCP) -> None:
         """Get analytic reports filtered by a government agency.
 
         Args:
-            agency_name: Name of the agency to filter by. Required.
-            report_name: Name of the report to retrieve. Required.
+            agency: Name of the agency to filter by (required).
+            report: Name of the report to retrieve (required).
             limit: Number of data points per page, from 1 to 10000. Defaults to 1000.
             page: Result page, starting at 1.
             after: Include dates on or after this YYYY-MM-DD date.
             before: Include dates on or before this YYYY-MM-DD date.
         """
-        agency_path = _path_segment(agency_name, "agency_name")
+        agency_path = _path_segment(agency, "agency")
         agency = parameters_values.validate_agency(agency_path)
         if not agency:
             raise ToolError(
@@ -89,7 +89,7 @@ def register(mcp: FastMCP) -> None:
                 "Please provide a valid agency name or acronym."
             )
 
-        report_path = _path_segment(report_name, "report_name")
+        report_path = _path_segment(report, "report")
         report = parameters_values.validate_report(report_path)
         if not report:
             raise ToolError(
@@ -112,18 +112,5 @@ def register(mcp: FastMCP) -> None:
         if isinstance(payload, list):
             return payload
         return payload.get("results", [])
-
-
-        # page = paginate(results, pagination.limit, pagination.offset)
-
-        # if response_format is ResponseFormat.MARKDOWN:
-        #     lines = [f"# Datasets matching '{query}'", ""]
-        #     lines += [f"- **{r['title']}** (`{r['id']}`)" for r in page["items"]]
-        #     lines.append("")
-        #     lines.append(
-        #         f"_Showing {page['count']} of {page['total']}._"
-        #         + (f" Next offset: {page['next_offset']}." if page["has_more"] else "")
-        #     )
-        #     return "\n".join(lines)
 
 
