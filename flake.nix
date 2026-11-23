@@ -54,12 +54,14 @@
             mcp-language-server
             curl
           ];
-          shellHook = ''
-            LC_ALL=C LANGUAGE=C LANG=C
-             echo "hello welcome the MCP flake dev shell
-                    ingestme <-- this command will read and build a duckdb database
-                    " | fold -w 40 -s | cowsay
-          '';
+          shellHook =
+            #bash
+            ''
+              LC_ALL=C LANGUAGE=C LANG=C
+               echo "hello welcome the MCP flake dev shell
+                      ingestme <-- this command will read from analytics.gov and build a duckdb database
+                      " | fold -w 40 -s | cowsay
+            '';
         };
     };
 }
