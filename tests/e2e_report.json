@@ -1,0 +1,242 @@
+[
+  {
+    "name": "initialize handshake",
+    "ok": true,
+    "detail": "2.2s"
+  },
+  {
+    "name": "expected tools present",
+    "ok": true,
+    "detail": "missing=set()"
+  },
+  {
+    "name": "tool 'get_analytic_reports' has description",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "tool 'get_analytic_reports' has object inputSchema",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "tool 'get_analytic_reports' readOnlyHint",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "tool 'get_agency_analytic_reports' has description",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "tool 'get_agency_analytic_reports' has object inputSchema",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "tool 'get_agency_analytic_reports' readOnlyHint",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "tool 'get_domain_analytic_reports' has description",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "tool 'get_domain_analytic_reports' has object inputSchema",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "tool 'get_domain_analytic_reports' readOnlyHint",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "tool 'get_top_pages_realtime' has description",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "tool 'get_top_pages_realtime' has object inputSchema",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "tool 'get_top_pages_realtime' readOnlyHint",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "resources listed",
+    "ok": true,
+    "detail": "about://info/server, analytics://about, data://top_downloads, parameters://agencies, parameters://agency_acronyms, parameters://reports, parameters://reports_definitions"
+  },
+  {
+    "name": "read resource about://info/server",
+    "ok": true,
+    "detail": "121 chars"
+  },
+  {
+    "name": "read resource analytics://about",
+    "ok": true,
+    "detail": "457 chars"
+  },
+  {
+    "name": "read resource data://top_downloads",
+    "ok": true,
+    "detail": "28985 chars"
+  },
+  {
+    "name": "read resource parameters://agencies",
+    "ok": true,
+    "detail": "2680 chars"
+  },
+  {
+    "name": "read resource parameters://agency_acronyms",
+    "ok": true,
+    "detail": "3311 chars"
+  },
+  {
+    "name": "read resource parameters://reports",
+    "ok": true,
+    "detail": "222 chars"
+  },
+  {
+    "name": "read resource parameters://reports_definitions",
+    "ok": true,
+    "detail": "1152 chars"
+  },
+  {
+    "name": "resource templates listed",
+    "ok": true,
+    "detail": "about://docs/{topic}"
+  },
+  {
+    "name": "prompts listed",
+    "ok": true,
+    "detail": "analyze_report"
+  },
+  {
+    "name": "invalid report name",
+    "ok": true,
+    "detail": "Invalid report 'nope'. Please provide a valid report name."
+  },
+  {
+    "name": "empty report name",
+    "ok": true,
+    "detail": "report must be a non-empty name, not '.' or '..'."
+  },
+  {
+    "name": "path traversal report",
+    "ok": true,
+    "detail": "report must be a non-empty name, not '.' or '..'."
+  },
+  {
+    "name": "report with slash",
+    "ok": true,
+    "detail": "Invalid report '..%2Fx'. Please provide a valid report name."
+  },
+  {
+    "name": "limit too large",
+    "ok": true,
+    "detail": "limit must be between 1 and 10000."
+  },
+  {
+    "name": "limit zero",
+    "ok": true,
+    "detail": "limit must be between 1 and 10000."
+  },
+  {
+    "name": "page zero",
+    "ok": true,
+    "detail": "page must be at least 1."
+  },
+  {
+    "name": "bad date format",
+    "ok": true,
+    "detail": "after must be a valid date in YYYY-MM-DD format."
+  },
+  {
+    "name": "impossible date",
+    "ok": true,
+    "detail": "after must be a valid date in YYYY-MM-DD format."
+  },
+  {
+    "name": "after > before",
+    "ok": true,
+    "detail": "after must be on or before before."
+  },
+  {
+    "name": "missing required arg",
+    "ok": true,
+    "detail": "1 validation error for call[get_analytic_reports]\nreport\n  Missing required argument [type=missing_argument, input_value={}, input_type=dict]\n    For "
+  },
+  {
+    "name": "wrong type for limit",
+    "ok": true,
+    "detail": "1 validation error for call[get_analytic_reports]\nlimit\n  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, inp"
+  },
+  {
+    "name": "unknown tool",
+    "ok": true,
+    "detail": "Unknown tool: 'does_not_exist'"
+  },
+  {
+    "name": "invalid agency (agency report)",
+    "ok": true,
+    "detail": "Invalid agency 'not-an-agency'. Please provide a valid agency name or acronym."
+  },
+  {
+    "name": "invalid report (agency report)",
+    "ok": true,
+    "detail": "Invalid report 'nope'. Please provide a valid report name."
+  },
+  {
+    "name": "invalid agency (realtime)",
+    "ok": true,
+    "detail": "Invalid agency 'not-an-agency'. Please provide a valid agency name or acronym."
+  },
+  {
+    "name": "agency path traversal (realtime)",
+    "ok": true,
+    "detail": "Invalid agency '../../etc'. Please provide a valid agency name or acronym."
+  },
+  {
+    "name": "invalid domain",
+    "ok": true,
+    "detail": "Invalid domain ''. Please provide a valid US agency domain name."
+  },
+  {
+    "name": "live: all-agency browser report",
+    "ok": true,
+    "detail": "returned 5 items"
+  },
+  {
+    "name": "live: pagination page 2",
+    "ok": true,
+    "detail": "returned 5 items"
+  },
+  {
+    "name": "live: date filter",
+    "ok": true,
+    "detail": "returned 5 items"
+  },
+  {
+    "name": "live: agency report (acronym)",
+    "ok": true,
+    "detail": "returned 5 items"
+  },
+  {
+    "name": "live: realtime top pages",
+    "ok": true,
+    "detail": "returned 30 items"
+  },
+  {
+    "name": "live: realtime via acronym",
+    "ok": true,
+    "detail": "returned 30 items"
+  }
+]
