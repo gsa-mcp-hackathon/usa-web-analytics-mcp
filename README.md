@@ -1,172 +1,136 @@
-# GSA MCP Hackathon — Server Template
+# USA Web Analytics MCP
 
-A ready-to-run starter for building a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server in Python, plus deployment kits for **IBM Cloud (watsonx Orchestrate)** and **Databricks**.
+An MCP server developed by the National Library of Medicine (NLM) for the GSA 2026 MCP Server Hackathon. It provides read-only access to United States government website analytics through tools backed by the GSA Digital Analytics Program (DAP).
 
-Built with [FastMCP](https://github.com/jlowin/fastmcp) and [uv](https://docs.astral.sh/uv/). If you have never built an MCP server before, start with **[QUICKSTART.md](QUICKSTART.md)**.
+The server uses [FastMCP](https://github.com/jlowin/fastmcp) and [uv](https://docs.astral.sh/uv/). It can run locally over stdio or remotely over streamable HTTP.
 
----
+## Features
 
-## What is an MCP server?
+- Retrieve analytics reports across all participating US government agencies.
+- Filter analytics reports by agency or US government web domain.
+- Retrieve the most recent 30 minutes of top pages for a selected agency.
+- Use inclusive `YYYY-MM-DD` date filters and paginated report requests.
+- Read agency, report, and parameter information through MCP resources.
+- Start report analysis through a reusable MCP prompt.
 
-An MCP server exposes **tools** (functions the model can call), **prompts** (reusable conversation starters), and **resources** (data the model can read) to an AI client such as Claude Desktop, Claude Code, or an agent platform like watsonx Orchestrate. You write the tools; the client's model decides when to call them.
+## Available tools
 
-This template gives you a working server with one example of each, so you can replace the examples with your own service and deploy.
+| Tool | Description |
+|---|---|
+| `get_analytic_reports` | Retrieve an analytics report across all agencies. |
+| `get_agency_analytic_reports` | Retrieve a report filtered by agency. |
+| `get_domain_analytic_reports` | Retrieve a report filtered by a US government web domain. |
+| `get_top_pages_realtime` | Retrieve the latest 30 minutes of top pages for an agency. |
 
----
+All tools are read-only and return structured data.
 
-## Repo structure
+## Prerequisites
 
-```
-mcp-hackathon-template/
-├── README.md                  # This file
-├── QUICKSTART.md              # 5-minute clone → run → connect walkthrough
-├── main.py                    # Local entry point (uv run python main.py)
-├── pyproject.toml             # Package + dependencies (uv)
-├── requirements.txt           # Mirror of runtime deps (for buildpack hosts)
-├── Dockerfile                 # Container image (streamable-HTTP, port 8080)
-├── manifest.yaml              # cloud.gov (Cloud Foundry) deploy
-├── server.json                # MCP registry metadata
-├── .env.example               # Copy to .env for local dev
-├── .github/workflows/ci.yml   # Lint + test on push/PR
-├── src/
-│   └── analytics_server/        # ← rename to your service
-│       ├── app.py             # Thin entry point: builds FastMCP, picks transport
-│       ├── config.py          # Settings from env vars / .env
-│       ├── models.py          # Pydantic models & enums for tool params
-│       ├── utils.py           # Shared helpers (HTTP client, pagination)
-│       ├── routes.py          # HTTP-only routes (/health, /version)
-│       ├── tools/             # ONE FILE PER TOOL
-│       │   ├── __init__.py    #   register_tools(mcp) aggregator
-│       │   └── example_tool.py
-│       ├── prompts/
-│       │   ├── __init__.py    #   register_prompts(mcp) aggregator
-│       │   └── example.py
-│       └── resources/
-│           ├── __init__.py    #   register_resources(mcp) aggregator
-│           └── example.py
-├── tests/                     # Import + registration smoke tests
-├── eval/                      # Stub → build a Phoenix eval harness (see mcp-eval skill)
-└── deploy/
-    ├── README.md              # Which deployment kit to use
-    ├── ibm/                   # watsonx Orchestrate: 3 kits (see below)
-    └── databricks/            # Databricks Apps kit
-```
+- Python 3.11 or newer
+- [uv](https://docs.astral.sh/uv/)
 
----
-
-## Getting started
-
-### Prerequisites
-- [uv](https://docs.astral.sh/uv/) — `pip install uv` or `brew install uv`
-
-### Install and run
+## Install and run locally
 
 ```bash
 cp .env.example .env
 uv sync
-uv run python main.py
+uv run analytics-server
 ```
 
-The server starts in **stdio** mode — it talks JSON-RPC over stdin/stdout, which is how local clients (Claude Desktop, Claude Code) launch it. See [QUICKSTART.md](QUICKSTART.md) to connect a client.
+The default transport is stdio, so the server communicates through standard input and output as a local MCP client subprocess.
 
-### Verify
+To run the HTTP transport locally:
+
+```powershell
+$env:MCP_TRANSPORT = "streamable-http"
+uv run analytics-server
+```
+
+The HTTP server listens on `0.0.0.0:8000` by default. Its MCP endpoint is `/mcp`, and it provides `/health` and `/version` status routes.
+
+Example client configuration:
+
+```json
+{
+  "mcpServers": {
+    "analytics-mcp": {
+      "command": "uv",
+      "args": ["run", "analytics-server"],
+      "cwd": "/absolute/path/to/mcp-hackathon-template"
+    }
+  }
+}
+```
+
+## Configuration
+
+Configuration is loaded from environment variables or a local `.env` file.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `MCP_TRANSPORT` | `stdio` | Use `stdio` locally or `streamable-http` remotely. |
+| `MCP_HOST` | `0.0.0.0` | HTTP bind address. |
+| `MCP_PORT` | `8000` | HTTP port. |
+| `ANALYTICS_API_KEY` | `DEMO_KEY` | API key sent to the GSA Analytics API. |
+| `ANALYTICS_API_BASE_URL` | GSA DAP API v2 URL | Override the upstream API origin. |
+
+Do not commit `.env` or API credentials. Use an environment secret store for deployed instances.
+
+## Project structure
+
+```text
+src/analytics_server/
+├── app.py           # FastMCP setup and transport selection
+├── config.py        # Environment-based settings
+├── models.py        # Pydantic inputs and shared types
+├── utils.py         # Outbound HTTP, validation, and pagination
+├── routes.py        # /health and /version routes
+├── tools/           # One MCP tool per module
+├── prompts/         # Reusable report-analysis prompt
+└── resources/       # Analytics and parameter resources
+tests/               # Import, registration, and security tests
+deploy/              # Platform deployment examples
+eval/                # Evaluation guidance
+```
+
+## Verification
 
 ```bash
 uv sync --group dev
-uv run pytest tests/ -v      # tests
-uv run ruff check .          # lint
+uv run pytest tests/ -v
+uv run ruff check .
 ```
 
----
+The test suite includes MCP registration checks and outbound HTTP security coverage, including validation of relative paths and sanitization of upstream failures.
 
-## The one-tool-per-file pattern
+## Security
 
-Each tool lives in its own file under `src/analytics_server/tools/` and exposes a `register(mcp)` function. `tools/__init__.py` calls each one from a single `register_tools(mcp)`. This keeps the tool list scannable and lets you add or remove an integration by touching two files.
+The MCP endpoint is unauthenticated by default. This is appropriate for the public-data hackathon posture but is not sufficient for a production deployment. Databricks Apps and other platforms may add authentication at the platform layer, but per-tool authorization and agency-specific ATO controls should be reviewed before production use.
 
-**Step 1 — create `src/analytics_server/tools/my_tool.py`:**
+The outbound HTTP helper:
 
-```python
-from typing import Annotated
-from urllib.parse import quote
-from fastmcp import FastMCP
+- Uses an operator-controlled GSA API origin.
+- Rejects absolute URLs, traversal paths, queries, fragments, and encoded escapes.
+- Disables redirects and environment proxy inheritance.
+- Applies a 30-second timeout and a five-megabyte response limit.
+- Sanitizes upstream errors so response bodies and sensitive values are not returned or logged.
 
-from analytics_server.utils import fetch_json
+Treat tool arguments, upstream content, and MCP messages as untrusted. Keep credentials out of source control and structured logs. See [SECURITY.md](SECURITY.md) for vulnerability reporting and additional guidance.
 
+## Deployment status
 
-def register(mcp: FastMCP) -> None:
-    @mcp.tool(
-        name="example_get_thing",
-        annotations={
-            "title": "Get a thing",
-            "readOnlyHint": True,
-            "destructiveHint": False,
-            "idempotentHint": True,
-            "openWorldHint": True,
-        },
-    )
-    async def get_thing(thing_id: Annotated[str, "The ID to fetch."]) -> dict:
-        """One-line summary. Document the data source, its update cadence,
-        and the return shape here — the model reads this docstring."""
-        safe_id = quote(thing_id, safe="")
-        return await fetch_json(f"things/{safe_id}")
-```
+Deployment examples are included for cloud.gov, IBM watsonx Orchestrate/Code Engine, and Databricks Apps:
 
-**Step 2 — wire it up in `tools/__init__.py`:**
+- [cloud.gov deployment manifest](manifest.yaml)
+- [IBM deployment kits](deploy/ibm/)
+- [Databricks deployment kit](deploy/databricks/)
 
-```python
-from analytics_server.tools import example_tool, my_tool
+**IBM and Databricks deployments have not been tested for this project.** Use the supplied kits as deployment templates and validate authentication, networking, secrets, health checks, and tool behavior in your target environment before use.
 
-def register_tools(mcp) -> None:
-    example_tool.register(mcp)
-    my_tool.register(mcp)  # ← add this line
-```
+## Evaluation
 
-**Step 3 — add any API key** as a typed field in `config.py` and document the env var in `.env.example`.
-
-Prompts (`prompts/`) and resources (`resources/`) follow the exact same `register(mcp)` + aggregator pattern.
-
----
-
-## Rename the package
-
-Before publishing your server, rename `analytics_server` to your service (e.g. `census_mcp`):
-
-1. Copy the folder  `src/example_server/` to `src/analytics_server/` --done
-2. Update `pyproject.toml`: the `[project].name`, `[project.scripts]`, and `[tool.hatch.build.targets.wheel].packages`. ---done
-3. Find-and-replace `example_server` across `src/`, `tests/`, `main.py`, `Dockerfile`, and `manifest.yaml`. ---done
-
----
-
-## Tool design tips (federal data)
-
-- **Return structured data, not prose.** Return dicts/lists with consistent keys and let the model narrate.
-- **Document freshness.** Federal datasets lag; state the update frequency and "as-of" date in the docstring.
-- **Expose pagination.** Use `PaginationParams` / `paginate()` from `utils.py`, and return `has_more` / `next_offset`.
-- **Use explicit timeouts.** `utils.fetch_json` defaults to 30s.
-- **Actionable errors.** Return an error dict with a `hint`, not a raw stack trace.
-- **Constrain outbound requests.** Keep API origins in operator-controlled code or configuration, pass only validated relative paths to `fetch_json`, and encode path segments. Never pass a tool-supplied URL directly to an HTTP client.
-- **Treat redirects and DNS as security boundaries.** Redirects are disabled by default. A server that must fetch caller-supplied URLs needs connection-time IP validation on every hop plus network egress controls; a one-time DNS check is not sufficient.
-- **Keep sensitive data out of errors and logs.** Do not expose or log upstream bodies, headers, full URLs, query strings, credentials, stack traces, SSNs, dates of birth, or addresses.
-
----
-
-## Deploying
-
-Local development uses stdio. To share your server with an agent platform, deploy it and register it. See **[deploy/README.md](deploy/README.md)** for a chooser, then:
-
-- **IBM watsonx Orchestrate** — [deploy/ibm/](deploy/ibm/) (three kits: local stdio toolkit, Code Engine build-from-Git, and prebuilt image).
-- **Databricks Apps** — [deploy/databricks/](deploy/databricks/).
-
-Both read the same server code; `app.py` automatically serves HTTP when the platform injects a port.
-
----
-
-## Evaluations
-
-Measuring how well an LLM can use your tools is the real test of server quality. This template intentionally does **not** ship an eval harness — see [eval/README.md](eval/README.md) for how to build one with the `mcp-eval` skill.
-
----
+This repository does not yet include a complete evaluation harness. See [eval/README.md](eval/README.md) for the evaluation approach and setup guidance.
 
 ## License
 
-[MIT](LICENSE). See [SECURITY.md](SECURITY.md) for the vulnerability disclosure policy and hackathon security notes.
+[MIT](LICENSE). The project is subject to the GSA vulnerability disclosure policy described in [SECURITY.md](SECURITY.md).
